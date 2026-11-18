@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lcrp5m.net/sitemap.xml
