@@ -227,10 +227,10 @@ function timeAgo(t) {
 }
 
 const DEPT_INFO = {
-  ccso: ["Blaine County & Roxwood", "County patrol, the jail and the courts, everywhere outside city limits."],
+  ccso: ["Clayton County", "County patrol, the jail and the courts, everywhere outside city limits."],
   gsp: ["Statewide", "Every highway and state route, plus backup for any agency that needs it."],
-  sfpd: ["Los Santos", "Everything inside city limits."],
-  fire: ["Blaine County & Roxwood", "Fire, rescue and EMS from stations across the county."],
+  sfpd: ["South Fulton", "Everything inside city limits."],
+  fire: ["Clayton County", "Fire, rescue and EMS from stations across the county."],
 };
 
 function initDeptMap() {
