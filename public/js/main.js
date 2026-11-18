@@ -253,21 +253,84 @@ function initDeptMap() {
 }
 
 function initTabs() {
+  const bar = $(".dtabs");
   const tabs = $$(".dtabs a");
-  if (!tabs.length) return;
+  if (!bar || !tabs.length) return;
+  const strip = $(".wrap", bar);
   const sections = tabs.map((a) => $(a.getAttribute("href")));
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        tabs.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === `#${e.target.id}`));
-        const active = $(".dtabs a.is-active");
-        active?.scrollIntoView({ block: "nearest", inline: "center", behavior: reduced ? "auto" : "smooth" });
-      });
-    },
-    { rootMargin: "-40% 0px -55% 0px" }
+  let current = null;
+  let lockUntil = 0;
+
+  const offset = () => ($(".nav")?.offsetHeight || 0) + bar.offsetHeight;
+
+  function setActive(i) {
+    if (i === current) return;
+    current = i;
+    tabs.forEach((a, k) => {
+      a.classList.toggle("is-active", k === i);
+      if (k === i) a.setAttribute("aria-current", "true");
+      else a.removeAttribute("aria-current");
+    });
+    const a = tabs[i];
+    if (a && strip.scrollWidth > strip.clientWidth) {
+      const left = a.offsetLeft - (strip.clientWidth - a.offsetWidth) / 2;
+      strip.scrollTo({ left, behavior: reduced ? "auto" : "smooth" });
+    }
+  }
+
+  function spy() {
+    if (performance.now() < lockUntil) return;
+    const line = offset() + 24;
+    let idx = 0;
+    sections.forEach((s, k) => {
+      if (s && s.getBoundingClientRect().top <= line) idx = k;
+    });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) idx = sections.length - 1;
+    setActive(idx);
+  }
+
+  tabs.forEach((a, i) =>
+    a.addEventListener("click", (e) => {
+      const target = sections[i];
+      if (!target) return;
+      e.preventDefault();
+      const top = target.getBoundingClientRect().top + scrollY - offset() + 1;
+      setActive(i);
+      lockUntil = performance.now() + 900;
+      window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+      history.replaceState(null, "", a.getAttribute("href"));
+    })
   );
-  sections.forEach((s) => s && io.observe(s));
+
+  let raf = 0;
+  addEventListener(
+    "scroll",
+    () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(spy);
+    },
+    { passive: true }
+  );
+  addEventListener("scrollend", () => {
+    lockUntil = 0;
+    spy();
+  });
+  addEventListener("resize", spy);
+
+  if (location.hash) {
+    const i = sections.findIndex((s) => s && `#${s.id}` === location.hash);
+    if (i >= 0) {
+      const jump = () => {
+        window.scrollTo({ top: sections[i].getBoundingClientRect().top + scrollY - offset() + 1, behavior: "instant" });
+        setActive(i);
+      };
+      requestAnimationFrame(jump);
+      if (document.readyState === "complete") setTimeout(jump, 60);
+      else addEventListener("load", () => setTimeout(jump, 60), { once: true });
+      return;
+    }
+  }
+  spy();
 }
 
 function initRules() {

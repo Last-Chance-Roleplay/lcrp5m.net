@@ -168,7 +168,7 @@ h1, h2, h3, h4 {
 @media (max-width: 1180px) {
   .nav__toggle { display: block; }
   .nav__links, .nav__cta { display: none; }
-  .nav.is-open { background: var(--ink); border-color: var(--line); }
+  .nav.is-open { background: var(--ink); border-color: var(--line); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .nav.is-open .nav__links {
     display: flex; flex-direction: column;
     position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0;
