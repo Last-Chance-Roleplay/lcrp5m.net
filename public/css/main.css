@@ -278,7 +278,9 @@ h1, h2, h3, h4 {
 .slash { color: var(--red); }
 
 /* about */
-.about { display: grid; grid-template-columns: 1.1fr .9fr; gap: 60px; align-items: start; }
+.about { display: grid; grid-template-columns: 1.1fr .9fr; gap: 60px; align-items: stretch; }
+.about__copy > :last-child { margin-bottom: 0; }
+.about__copy > .eyebrow { display: flex; }
 .about__copy p { margin: 0 0 18px; font-size: 1.1rem; }
 .about__copy p:first-of-type { font-size: 1.35rem; color: var(--white); line-height: 1.45; }
 .about__copy a { color: var(--white); text-decoration-color: var(--red); text-underline-offset: 3px; }
@@ -410,7 +412,8 @@ a.stack__item:hover { background: var(--coal); }
 .stack__item .ext { position: absolute; top: 26px; right: 24px; width: 16px; height: 16px; color: var(--steel-mute); transition: color .2s, transform .2s; }
 a.stack__item:hover .ext { color: var(--white); transform: translate(2px, -2px); }
 @media (max-width: 960px) { .stack { grid-template-columns: 1fr 1fr; } }
-.stack--about { grid-template-columns: 1fr 1fr; }
+.stack--about { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.stack--about .stack__item { justify-content: center; }
 @media (max-width: 520px) { .stack, .stack--about { grid-template-columns: 1fr; } }
 
 /* faq */
