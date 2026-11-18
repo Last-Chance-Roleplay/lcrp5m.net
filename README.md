@@ -37,7 +37,7 @@ Every push to `main` builds and deploys.
 
 ## Department patches
 
-Drop PNGs with transparent backgrounds into `public/assets/img/depts/` named `ccso.png`, `gsp.png`, `sfpd.png` and `fire.png`. Until a file exists the site shows a text seal in its place.
+Drop PNGs with transparent backgrounds into `public/assets/img/depts/` named `ccso-logo.webp`, `gsp-logo.webp`, `sfpd-logo.webp` and `ccfes-logo.webp`. Until a file exists the site shows a text seal in its place.
 
 ## Gallery
 

@@ -95,8 +95,8 @@ export function renderGallery(part, shots) {
         <div><span class="eyebrow">From the city</span><h2>Caught on <span class="slash">camera</span></h2></div>
         <a class="btn btn--ghost" href="/gallery">View all ${shots.length}</a>
       </div>
+      <div class="gmosaic" data-reveal>${shots.slice(0, 5).map((s) => tile(s, "gmosaic__item")).join("")}</div>
     </div>
-    <div class="gstrip" data-reveal>${shots.slice(0, 8).map((s) => tile(s, "gstrip__item")).join("")}</div>
   </section>`;
   }
   throw new Error(`Unknown gallery part ${part}`);
