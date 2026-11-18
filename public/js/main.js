@@ -227,10 +227,10 @@ function timeAgo(t) {
 }
 
 const DEPT_INFO = {
-  ccso: ["Blaine County & Roxwood", "Everything outside the city: Sandy Shores, Grapeseed, Paleto Bay and all of Roxwood."],
-  gsp: ["Statewide", "Every highway and back road in San Andreas, from the Los Santos freeways to Roxwood."],
-  sfpd: ["Los Santos", "The whole city, from Vespucci and Del Perro to Davis, Mirror Park and Vinewood."],
-  fire: ["Blaine County & Roxwood", "Fire, rescue and EMS from stations across Blaine County and Roxwood."],
+  ccso: ["Blaine County & Roxwood", "County patrol, the jail and the courts, everywhere outside city limits."],
+  gsp: ["Statewide", "Every highway and state route, plus backup for any agency that needs it."],
+  sfpd: ["Los Santos", "Everything inside city limits."],
+  fire: ["Blaine County & Roxwood", "Fire, rescue and EMS from stations across the county."],
 };
 
 function initDeptMap() {

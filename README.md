@@ -47,8 +47,8 @@ Optional captions and ordering go in `public/assets/img/gallery/captions.json`:
 
 ```json
 {
-  "sandy-stop.jpg": "CCSO traffic stop in Sandy Shores",
-  "ls-night.jpg": "Night shift in Los Santos"
+  "traffic-stop.jpg": "CCSO traffic stop",
+  "night-shift.jpg": "Night shift"
 }
 ```
 
