@@ -10,27 +10,28 @@ Plain HTML, CSS and JavaScript with no runtime dependencies. Pages in `src/pages
 src/pages/       one file per route
 src/partials/    head, nav, footer
 public/          css, js, images, _headers, _redirects
-functions/       Cloudflare Pages Functions
+worker/          Cloudflare Worker (serves dist, handles /api/status)
 ```
 
 ## Local dev
 
 ```
-npm run build
-npx wrangler pages dev dist
+npm install
+npm run dev
 ```
 
-`npx serve dist` also works, but `/api/status` only exists under Wrangler or on Cloudflare.
+## Cloudflare
 
-## Cloudflare Pages
+Deployed as a Worker with static assets, configured in `wrangler.jsonc`.
 
 - Build command: `npm run build`
-- Output directory: `dist`
-- Functions are picked up from `functions/` automatically
+- Deploy command: `npx wrangler deploy`
+
+Every push to `main` builds and deploys.
 
 ## Live data
 
-- The "City" and uptime numbers on the home page come from the Uptime Kuma page at status.lcrp5m.net, proxied through `functions/api/status.js` and cached for 60 seconds.
+- The "City" and uptime numbers on the home page come from the Uptime Kuma page at status.lcrp5m.net, proxied through `worker/index.js` and cached for 60 seconds.
 - Discord member and online counts come straight from the public invite API.
 - Live player counts turn on once `cfxCode` is set at the top of `public/js/main.js`.
 
