@@ -747,7 +747,9 @@ a.stack__item:hover .ext { color: var(--white); transform: translate(2px, -2px);
 }
 
 /* gallery */
-.ggrid { columns: 3 320px; column-gap: 12px; }
+.gwide { padding: 0 clamp(12px, 1.6vw, 28px); }
+.ggrid { columns: 6 300px; column-gap: 10px; }
+.ggrid .gtile { margin-bottom: 10px; }
 .gtile, .gmosaic__item { position: relative; display: block; overflow: hidden; background: var(--slate); cursor: zoom-in; }
 .gtile { margin-bottom: 12px; break-inside: avoid; }
 .gtile img, .gmosaic__item img { width: 100%; height: auto; transition: transform .6s cubic-bezier(.2, .7, .2, 1), filter .4s; }
