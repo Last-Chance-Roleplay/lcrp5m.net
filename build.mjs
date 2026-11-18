@@ -36,8 +36,19 @@ function skyline(seed, w = 1600, h = 300) {
 
 const shots = await loadGallery();
 
+function social(html) {
+  const desc = html.match(/<meta name="description" content="([^"]*)">/)?.[1];
+  const canon = html.match(/<link rel="canonical" href="([^"]*)">/)?.[1];
+  const title = html.match(/<meta property="og:title" content="([^"]*)">/)?.[1];
+  const add = [];
+  if (desc && !html.includes('property="og:description"')) add.push(`<meta property="og:description" content="${desc}">`);
+  if (canon && !html.includes('property="og:url"')) add.push(`<meta property="og:url" content="${canon}">`);
+  if (title && !html.includes('name="twitter:title"')) add.push(`<meta name="twitter:title" content="${title}">`);
+  return add.length ? html.replace("</head>", `${add.join("\n")}\n</head>`) : html;
+}
+
 function render(html, page) {
-  return html
+  return social(html)
     .replace(/<!--\s*@(\w+)\s*-->/g, (_, n) => {
       if (!(n in partials)) throw new Error(`Missing partial ${n} in ${page}`);
       return partials[n];
