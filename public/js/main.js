@@ -507,13 +507,11 @@ function initBoard() {
         total++;
         if (!up) down++;
         const uptime = s.uptimeList?.[`${m.id}_24`];
-        const pings = beats.map((b) => b.ping).filter(Number.isFinite);
-        const avg = pings.length ? Math.round(pings.reduce((a, b) => a + b, 0) / pings.length) : null;
         const row = document.createElement("div");
         row.className = "mon";
         row.innerHTML = `
           <div class="mon__name"><i class="dot ${last ? (up ? "is-up" : "is-down") : ""}"></i><span></span></div>
-          <div class="mon__stats mono"><span>avg <b>${avg ?? "--"}</b> ms</span><span>24h <b>${Number.isFinite(uptime) ? (uptime * 100).toFixed(2) + "%" : "--"}</b></span></div>
+          <div class="mon__stats mono"><span>24h <b>${Number.isFinite(uptime) ? (uptime * 100).toFixed(2) + "%" : "--"}</b></span></div>
           <div class="beats"></div>
           <div class="beats__axis mono"><span>${beats.length ? beats.length + "m ago" : ""}</span><span>now</span></div>`;
         row.querySelector(".mon__name span").textContent = m.name.replace(/^LCRP\s*-\s*/, "");
@@ -524,7 +522,7 @@ function initBoard() {
           const i = document.createElement("i");
           i.className = b.status === 1 ? "u" : b.status === 0 ? "d" : "p";
           const d = parseKumaTime(b.time);
-          i.dataset.t = `${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${b.status === 1 ? "Up" : "Down"}${Number.isFinite(b.ping) ? ` · ${b.ping} ms` : ""}`;
+          i.dataset.t = `${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${b.status === 1 ? "Up" : "Down"}`;
           bar.append(i);
         });
         list.append(row);
@@ -547,6 +545,76 @@ function initBoard() {
   setInterval(() => !document.hidden && load(), 60000);
 }
 
+function initPotd() {
+  const root = $("[data-potd]");
+  const data = $("#potd-data");
+  if (!root || !data) return;
+  let list;
+  try {
+    list = JSON.parse(data.textContent);
+  } catch {
+    return;
+  }
+  if (!list.length) return;
+
+  const TZ = "America/New_York";
+  const HALF_LIFE = 8;
+  const parts = (d) => Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d).map((p) => [p.type, p.value]));
+  const today = parts(new Date());
+  const dayNum = Math.floor(Date.UTC(+today.year, +today.month - 1, +today.day) / 864e5);
+
+  const rng = (seed) => () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const weights = list.map((_, i) => Math.pow(0.5, i / HALF_LIFE));
+  const total = weights.reduce((a, b) => a + b, 0);
+  const draw = (seed) => {
+    let r = rng(seed)() * total;
+    for (let i = 0; i < weights.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return i;
+    }
+    return weights.length - 1;
+  };
+  const pickFor = (day, avoid) => {
+    let i = draw(day * 7919);
+    for (let k = 1; i === avoid && list.length > 1 && k < 20; k++) i = draw(day * 7919 + k);
+    return i;
+  };
+
+  let prev = -1;
+  let idx = 0;
+  for (let d = dayNum - 6; d <= dayNum; d++) {
+    idx = pickFor(d, prev);
+    prev = idx;
+  }
+
+  const shot = list[idx];
+  const link = $(".potd__img", root);
+  const img = $("img", link);
+  link.href = shot.full;
+  link.dataset.caption = shot.caption || "";
+  img.src = shot.src;
+  img.alt = shot.caption || "Shot of the day";
+  $("[data-potd-cap]", root).textContent = shot.caption || "";
+  $("[data-potd-date]", root).textContent = new Date(Date.UTC(+today.year, +today.month - 1, +today.day, 12)).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
+
+  const next = $("[data-potd-next]", root);
+  const tick = () => {
+    const now = new Date();
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(now).map((x) => [x.type, x.value]));
+    const left = 86400 - (+p.hour * 3600 + +p.minute * 60 + +p.second);
+    const h = Math.floor(left / 3600);
+    const m = Math.floor((left % 3600) / 60);
+    next.textContent = `Next shot in ${h}h ${String(m).padStart(2, "0")}m`;
+  };
+  tick();
+  setInterval(tick, 30000);
+}
+
 function initYear() {
   $$("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 }
@@ -561,4 +629,5 @@ initTabs();
 initRules();
 initGallery();
 initBoard();
+initPotd();
 initYear();
