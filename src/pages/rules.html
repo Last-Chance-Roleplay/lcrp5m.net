@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<!-- @head -->
+<title>Rules | Last Chance Roleplay</title>
+<meta name="description" content="The full rules and infraction guidelines for Last Chance Roleplay.">
+<meta property="og:title" content="Rules | Last Chance Roleplay">
+<link rel="canonical" href="https://lcrp5m.net/rules">
+</head>
+<body>
+<!-- @nav -->
+
+<main id="main">
+  <header class="phead" data-mark="Rules">
+    <div class="wrap">
+      <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Rules</span></nav>
+      <h1>Rules &amp; <span class="slash">regulations</span></h1>
+      <p>Not knowing them isn't an excuse. {{rules:count}} rules across 14 sections. Search them, filter by penalty, or click a rule number to copy a direct link.</p>
+    </div>
+  </header>
+
+  <div class="rbar" data-rbar>
+    <div class="wrap rbar__inner">
+      <label class="rsearch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <span class="sr">Search rules</span>
+        <input type="search" placeholder="Search rules, e.g. metagaming, hostage, VDM" autocomplete="off" data-rsearch>
+        <kbd class="mono">/</kbd>
+      </label>
+      <div class="chips" role="group" aria-label="Filter by penalty">{{rules:chips}}</div>
+      <span class="rcount mono" data-rcount aria-live="polite"></span>
+    </div>
+  </div>
+
+  <div class="wrap rlayout">
+    <aside class="rtoc" aria-label="Sections">
+      <nav>
+        <span class="mono">Sections</span>
+        <ol>
+          {{rules:toc}}
+        </ol>
+      </nav>
+    </aside>
+    <div class="rcontent">
+      {{rules:intro}}
+      {{rules:body}}
+      <div class="rempty" data-rempty hidden>
+        <h3>No rules match</h3>
+        <p>Try another word, or clear the filters.</p>
+        <button class="btn btn--ghost" type="button" data-rclear>Clear filters</button>
+      </div>
+      <div class="notice">
+        <p><strong>Saw a rule break?</strong> Finish the interaction, then open a ticket in the Discord with clips if you have them.</p>
+        <a class="btn" href="https://discord.gg/lcrp5m" rel="noopener">Open a ticket</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- @foot -->
+</body>
+</html>

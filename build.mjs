@@ -1,5 +1,7 @@
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { renderRules } from "./src/rules.mjs";
+import { loadGallery, renderGallery } from "./src/gallery.mjs";
 
 const out = "dist";
 const partials = {};
@@ -32,6 +34,8 @@ function skyline(seed, w = 1600, h = 300) {
   return `${d} L${w} ${h} Z`;
 }
 
+const shots = await loadGallery();
+
 function render(html, page) {
   return html
     .replace(/<!--\s*@(\w+)\s*-->/g, (_, n) => {
@@ -39,7 +43,9 @@ function render(html, page) {
       return partials[n];
     })
     .replace(/\{\{cur:(\w+)\}\}/g, (_, n) => (n === page ? ' aria-current="page"' : ""))
-    .replace(/\{\{skyline:(\d+)\}\}/g, (_, n) => skyline(Number(n)));
+    .replace(/\{\{skyline:(\d+)\}\}/g, (_, n) => skyline(Number(n)))
+    .replace(/\{\{rules:(\w+)\}\}/g, (_, part) => renderRules(part))
+    .replace(/\{\{gallery:(\w+)\}\}/g, (_, part) => renderGallery(part, shots));
 }
 
 await rm(out, { recursive: true, force: true });
@@ -51,4 +57,4 @@ for (const f of await readdir("src/pages")) {
   const html = render(await readFile(join("src/pages", f), "utf8"), page === "index" ? "home" : page);
   await writeFile(join(out, f), html);
 }
-console.log("built", out);
+console.log(`built ${out} (${shots.length} gallery shots)`);
