@@ -1,7 +1,7 @@
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { renderRules } from "./src/rules.mjs";
-import { loadGallery, renderGallery } from "./src/gallery.mjs";
+import { loadGallery, makeThumbs, renderGallery } from "./src/gallery.mjs";
 
 const out = "dist";
 const partials = {};
@@ -51,6 +51,7 @@ function render(html, page) {
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 await cp("public", out, { recursive: true });
+await makeThumbs(shots, out);
 
 for (const f of await readdir("src/pages")) {
   const page = f.replace(/\.html$/, "");

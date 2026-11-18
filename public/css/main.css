@@ -805,7 +805,7 @@ a.stack__item:hover .ext { color: var(--white); transform: translate(2px, -2px);
 
 .gstrip__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 32px; }
 .gstrip__head h2 { font-size: clamp(2.4rem, 5.6vw, 4.4rem); }
-.gstrip { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))) 14px; scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.gstrip { --edge: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))); display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 var(--edge) 14px; scroll-padding-inline: var(--edge); scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
 .gstrip__item { flex: none; height: clamp(220px, 32vw, 380px); scroll-snap-align: start; }
 .gstrip__item img { width: auto; height: 100%; }
 .gstrip-sec { padding-bottom: clamp(80px, 11vw, 140px); }

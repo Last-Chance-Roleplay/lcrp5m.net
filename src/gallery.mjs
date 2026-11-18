@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { readFile, readdir, stat } from "node:fs/promises";
+import { mkdir, readFile, readdir } from "node:fs/promises";
 import { extname, join } from "node:path";
 
 const DIR = "public/assets/img/gallery";
@@ -39,20 +39,43 @@ export async function loadGallery() {
     const path = join(DIR, f);
     const buf = await readFile(path);
     const dim = size(buf, extname(f).toLowerCase()) || [1600, 900];
-    shots.push({ f, w: dim[0], h: dim[1], mtime: (await stat(path)).mtimeMs, caption: captions[f] || "" });
+    shots.push({ f, w: dim[0], h: dim[1], caption: captions[f] || "", thumb: null });
   }
   const order = Object.keys(captions);
+  const byName = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
   return shots.sort((a, b) => {
     const ia = order.indexOf(a.f);
     const ib = order.indexOf(b.f);
     if (ia !== -1 || ib !== -1) return (ia === -1 ? 1e9 : ia) - (ib === -1 ? 1e9 : ib);
-    return b.mtime - a.mtime;
+    return byName.compare(b.f, a.f);
   });
+}
+
+export async function makeThumbs(shots, out) {
+  let sharp;
+  try {
+    sharp = (await import("sharp")).default;
+  } catch {
+    console.warn("sharp not installed, gallery will use full-size images");
+    return;
+  }
+  const dir = join(out, "assets/img/gallery/_thumbs");
+  await mkdir(dir, { recursive: true });
+  await Promise.all(
+    shots.map(async (s) => {
+      const name = s.f.replace(/\.[^.]+$/, "") + ".webp";
+      const info = await sharp(join(DIR, s.f)).rotate().resize({ width: 720, withoutEnlargement: true }).webp({ quality: 72 }).toFile(join(dir, name));
+      s.thumb = `/assets/img/gallery/_thumbs/${encodeURIComponent(name)}`;
+      s.tw = info.width;
+      s.th = info.height;
+    })
+  );
 }
 
 function tile(s, cls) {
   const src = `/assets/img/gallery/${encodeURIComponent(s.f)}`;
-  return `<a class="${cls}" href="${src}" data-shot data-caption="${esc(s.caption)}"><img src="${src}" alt="${esc(s.caption || "Last Chance Roleplay screenshot")}" width="${s.w}" height="${s.h}" loading="lazy" decoding="async">${s.caption ? `<span>${esc(s.caption)}</span>` : ""}</a>`;
+  const img = s.thumb || src;
+  return `<a class="${cls}" href="${src}" data-shot data-caption="${esc(s.caption)}"><img src="${img}" alt="${esc(s.caption || "Last Chance Roleplay screenshot")}" width="${s.tw || s.w}" height="${s.th || s.h}" loading="lazy" decoding="async">${s.caption ? `<span>${esc(s.caption)}</span>` : ""}</a>`;
 }
 
 export function renderGallery(part, shots) {

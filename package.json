@@ -8,6 +8,7 @@
     "deploy": "node build.mjs && wrangler deploy"
   },
   "devDependencies": {
+    "sharp": "^0.34.4",
     "wrangler": "^4.40.0"
   }
 }

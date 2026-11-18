@@ -41,7 +41,7 @@ Drop PNGs with transparent backgrounds into `public/assets/img/depts/` named `cc
 
 ## Gallery
 
-Every image in `public/assets/img/gallery/` (jpg, png or webp) shows up on `/gallery`, newest first, and the latest eight also appear on the home page. Nothing else to edit.
+Every image in `public/assets/img/gallery/` (jpg, png or webp) shows up on `/gallery`, sorted by file name with the newest names first, and the first eight also appear on the home page. The build makes small previews with sharp, so the full image only loads when someone opens it.
 
 Optional captions and ordering go in `public/assets/img/gallery/captions.json`:
 
@@ -52,7 +52,7 @@ Optional captions and ordering go in `public/assets/img/gallery/captions.json`:
 }
 ```
 
-Files listed there come first, in that order. Keep screenshots under about 1 MB each (JPG or WebP at 1920px wide is plenty) so the page stays fast.
+Files listed there come first, in that order.
 
 ## Rules
 
