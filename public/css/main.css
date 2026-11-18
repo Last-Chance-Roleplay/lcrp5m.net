@@ -219,9 +219,6 @@ h1, h2, h3, h4 {
 @keyframes lightbar { 0%, 8%, 16% { opacity: 1; } 4%, 12%, 20%, 100% { opacity: 0; } }
 
 .hero__inner { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; }
-.hero__kicker { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 26px; color: var(--steel-dim); }
-.hero__kicker span { display: inline-flex; align-items: center; gap: 8px; }
-.hero__kicker span + span::before { content: ""; width: 4px; height: 4px; background: var(--red); transform: rotate(45deg); margin-right: 10px; }
 
 .hero h1 { font-size: clamp(3.6rem, 9.4vw, 8.6rem); line-height: .84; letter-spacing: -.005em; }
 .hero h1 .line { display: block; }
