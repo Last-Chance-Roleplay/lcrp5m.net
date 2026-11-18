@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { renderRules } from "./src/rules.mjs";
@@ -35,6 +36,12 @@ function skyline(seed, w = 1600, h = 300) {
 }
 
 const shots = await loadGallery();
+
+const version = async (file) => createHash("sha1").update(await readFile(join("public", file))).digest("hex").slice(0, 10);
+const assetVersions = { "/css/main.css": await version("css/main.css"), "/js/main.js": await version("js/main.js") };
+for (const [k, v] of Object.entries(assetVersions)) {
+  for (const name of Object.keys(partials)) partials[name] = partials[name].replaceAll(`"${k}"`, `"${k}?v=${v}"`);
+}
 
 function social(html) {
   const desc = html.match(/<meta name="description" content="([^"]*)">/)?.[1];
