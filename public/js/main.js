@@ -557,62 +557,59 @@ function initPotd() {
   }
   if (!list.length) return;
 
-  const TZ = "America/New_York";
-  const HALF_LIFE = 8;
-  const parts = (d) => Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d).map((p) => [p.type, p.value]));
-  const today = parts(new Date());
-  const dayNum = Math.floor(Date.UTC(+today.year, +today.month - 1, +today.day) / 864e5);
-
-  const rng = (seed) => () => {
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  const HALF_LIFE = 15;
+  const KEY = "lcrp:last-shot";
   const weights = list.map((_, i) => Math.pow(0.5, i / HALF_LIFE));
-  const total = weights.reduce((a, b) => a + b, 0);
-  const draw = (seed) => {
-    let r = rng(seed)() * total;
+  const link = $(".potd__img", root);
+  const img = $("img", link);
+  const cap = $("[data-potd-cap]", root);
+  const count = $("[data-potd-n]", root);
+  let current = -1;
+
+  const read = () => {
+    try {
+      return localStorage.getItem(KEY);
+    } catch {
+      return null;
+    }
+  };
+  const save = (v) => {
+    try {
+      localStorage.setItem(KEY, v);
+    } catch {}
+  };
+
+  function pick(avoid) {
+    const total = weights.reduce((a, w, i) => a + (avoid.has(i) ? 0 : w), 0);
+    let r = Math.random() * total;
     for (let i = 0; i < weights.length; i++) {
+      if (avoid.has(i)) continue;
       r -= weights[i];
       if (r <= 0) return i;
     }
-    return weights.length - 1;
-  };
-  const pickFor = (day, avoid) => {
-    let i = draw(day * 7919);
-    for (let k = 1; i === avoid && list.length > 1 && k < 20; k++) i = draw(day * 7919 + k);
-    return i;
-  };
-
-  let prev = -1;
-  let idx = 0;
-  for (let d = dayNum - 6; d <= dayNum; d++) {
-    idx = pickFor(d, prev);
-    prev = idx;
+    return 0;
   }
 
-  const shot = list[idx];
-  const link = $(".potd__img", root);
-  const img = $("img", link);
-  link.href = shot.full;
-  link.dataset.caption = shot.caption || "";
-  img.src = shot.src;
-  img.alt = shot.caption || "Shot of the day";
-  $("[data-potd-cap]", root).textContent = shot.caption || "";
-  $("[data-potd-date]", root).textContent = new Date(Date.UTC(+today.year, +today.month - 1, +today.day, 12)).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
+  function show(i) {
+    current = i;
+    const shot = list[i];
+    link.href = shot.full;
+    link.dataset.caption = shot.caption || "";
+    img.classList.remove("is-in");
+    img.onload = () => img.classList.add("is-in");
+    img.src = shot.src;
+    img.alt = shot.caption || "Screenshot from Last Chance Roleplay";
+    cap.textContent = shot.caption || "";
+    count.textContent = `${String(i + 1).padStart(2, "0")} / ${String(list.length).padStart(2, "0")}`;
+    save(shot.full);
+  }
 
-  const next = $("[data-potd-next]", root);
-  const tick = () => {
-    const now = new Date();
-    const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(now).map((x) => [x.type, x.value]));
-    const left = 86400 - (+p.hour * 3600 + +p.minute * 60 + +p.second);
-    const h = Math.floor(left / 3600);
-    const m = Math.floor((left % 3600) / 60);
-    next.textContent = `Next shot in ${h}h ${String(m).padStart(2, "0")}m`;
-  };
-  tick();
-  setInterval(tick, 30000);
+  const last = list.findIndex((s) => s.full === read());
+  show(pick(new Set(list.length > 1 && last >= 0 ? [last] : [])));
+
+  $("[data-potd-shuffle]", root)?.addEventListener("click", () => {
+    show(pick(new Set(list.length > 1 ? [current] : [])));
+  });
 }
 
 function initYear() {

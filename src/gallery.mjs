@@ -125,17 +125,21 @@ export function renderGallery(part, shots) {
   <section class="section section--tight potd-sec" style="padding-top:0">
     <div class="wrap">
       <div class="gstrip__head" data-reveal>
-        <div><span class="eyebrow">Shot of the day</span><h2>Today in <span class="slash">the city</span></h2></div>
+        <div><span class="eyebrow">From the city</span><h2>Caught on <span class="slash">camera</span></h2></div>
         <a class="btn btn--ghost" href="/gallery">View all ${shots.length}</a>
       </div>
       <figure class="potd chamfer" data-potd data-reveal>
         <a class="potd__img" href="${first.full}" data-shot data-caption="${esc(first.caption)}">
-          <img src="${first.src}" alt="${esc(first.caption || "Shot of the day")}" loading="lazy" decoding="async">
+          <img alt="" decoding="async">
+          <noscript><img src="${first.src}" alt="${esc(first.caption || "Screenshot from Last Chance Roleplay")}" class="is-in"></noscript>
         </a>
         <figcaption class="potd__bar">
-          <span class="mono potd__date" data-potd-date></span>
-          <span class="potd__cap" data-potd-cap>${esc(first.caption)}</span>
-          <span class="mono potd__next" data-potd-next></span>
+          <span class="mono potd__n" data-potd-n></span>
+          <span class="potd__cap" data-potd-cap></span>
+          <button class="potd__shuffle mono" type="button" data-potd-shuffle>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            Shuffle
+          </button>
         </figcaption>
       </figure>
       <script type="application/json" id="potd-data">${JSON.stringify(list).replace(/</g, "\\u003c")}</script>
