@@ -227,10 +227,10 @@ function timeAgo(t) {
 }
 
 const DEPT_INFO = {
-  ccso: ["Clayton County", "Unincorporated Clayton, county roads, the jail and courts."],
-  gsp: ["Statewide", "I-75, I-85, I-285 and every state route in between."],
-  sfpd: ["City of South Fulton", "Old National, Camp Creek, Cascade and the city limits."],
-  fire: ["Clayton County", "Fire suppression, rescue and EMS from stations across the county."],
+  ccso: ["Blaine County & Roxwood", "Everything outside the city: Sandy Shores, Grapeseed, Paleto Bay and all of Roxwood."],
+  gsp: ["Statewide", "Every highway and back road in San Andreas, from the Los Santos freeways to Roxwood."],
+  sfpd: ["Los Santos", "The whole city, from Vespucci and Del Perro to Davis, Mirror Park and Vinewood."],
+  fire: ["Blaine County & Roxwood", "Fire, rescue and EMS from stations across Blaine County and Roxwood."],
 };
 
 function initDeptMap() {
@@ -459,6 +459,94 @@ function initGallery() {
   });
 }
 
+function initBoard() {
+  const board = $("[data-board]");
+  if (!board) return;
+  const groupsEl = $("[data-groups]", board);
+  const stateEl = $("[data-state]", board);
+  const stateDot = $("[data-state-dot]", board);
+  const updated = $("[data-updated]", board);
+  const tip = document.createElement("div");
+  tip.className = "tip";
+  document.body.append(tip);
+
+  groupsEl.addEventListener("pointerover", (e) => {
+    const b = e.target.closest(".beats i");
+    if (!b || !b.dataset.t) return;
+    tip.textContent = b.dataset.t;
+    const r = b.getBoundingClientRect();
+    tip.style.left = `${Math.min(innerWidth - 90, Math.max(90, r.left + r.width / 2))}px`;
+    tip.style.top = `${r.top}px`;
+    tip.classList.add("is-on");
+  });
+  groupsEl.addEventListener("pointerout", () => tip.classList.remove("is-on"));
+
+  async function load() {
+    let s;
+    try {
+      s = await getStatus();
+    } catch {
+      stateEl.textContent = "Status feed unavailable";
+      stateDot.className = "dot is-warn";
+      return;
+    }
+    const groups = s.config?.publicGroupList || [];
+    let down = 0;
+    let total = 0;
+    groupsEl.innerHTML = "";
+    groups.forEach((g) => {
+      const sec = document.createElement("section");
+      sec.className = "board__group";
+      sec.innerHTML = `<h3></h3><div class="monitors"></div>`;
+      sec.querySelector("h3").textContent = g.name;
+      const list = sec.querySelector(".monitors");
+      g.monitorList.forEach((m) => {
+        const beats = (s.heartbeatList?.[m.id] || []).slice(-60);
+        const last = beats[beats.length - 1];
+        const up = last?.status === 1;
+        total++;
+        if (!up) down++;
+        const uptime = s.uptimeList?.[`${m.id}_24`];
+        const pings = beats.map((b) => b.ping).filter(Number.isFinite);
+        const avg = pings.length ? Math.round(pings.reduce((a, b) => a + b, 0) / pings.length) : null;
+        const row = document.createElement("div");
+        row.className = "mon";
+        row.innerHTML = `
+          <div class="mon__name"><i class="dot ${last ? (up ? "is-up" : "is-down") : ""}"></i><span></span></div>
+          <div class="mon__stats mono"><span>avg <b>${avg ?? "--"}</b> ms</span><span>24h <b>${Number.isFinite(uptime) ? (uptime * 100).toFixed(2) + "%" : "--"}</b></span></div>
+          <div class="beats"></div>
+          <div class="beats__axis mono"><span>${beats.length ? beats.length + "m ago" : ""}</span><span>now</span></div>`;
+        row.querySelector(".mon__name span").textContent = m.name.replace(/^LCRP\s*-\s*/, "");
+        const bar = row.querySelector(".beats");
+        const pad = 60 - beats.length;
+        for (let i = 0; i < pad; i++) bar.append(document.createElement("i"));
+        beats.forEach((b) => {
+          const i = document.createElement("i");
+          i.className = b.status === 1 ? "u" : b.status === 0 ? "d" : "p";
+          const d = parseKumaTime(b.time);
+          i.dataset.t = `${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${b.status === 1 ? "Up" : "Down"}${Number.isFinite(b.ping) ? ` · ${b.ping} ms` : ""}`;
+          bar.append(i);
+        });
+        list.append(row);
+      });
+      groupsEl.append(sec);
+    });
+    if (!total) {
+      stateEl.textContent = "No monitors published";
+      stateDot.className = "dot";
+    } else if (!down) {
+      stateEl.textContent = "All systems operational";
+      stateDot.className = "dot is-up";
+    } else {
+      stateEl.textContent = `${down} of ${total} systems reporting down`;
+      stateDot.className = down === total ? "dot is-down" : "dot is-warn";
+    }
+    updated.textContent = `Updated ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  }
+  load();
+  setInterval(() => !document.hidden && load(), 60000);
+}
+
 function initYear() {
   $$("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 }
@@ -472,4 +560,5 @@ initDeptMap();
 initTabs();
 initRules();
 initGallery();
+initBoard();
 initYear();
