@@ -333,7 +333,6 @@ h1, h2, h3, h4 {
   min-height: 460px;
   display: flex; flex-direction: column;
 }
-.map__head { display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); color: var(--steel-mute); }
 .map svg { flex: 1; width: 100%; height: auto; display: block; }
 .map__foot { padding: 14px 18px; border-top: 1px solid var(--line); min-height: 76px; }
 .map__foot strong { display: block; font: 800 1.2rem/1 var(--f-display); text-transform: uppercase; color: var(--white); letter-spacing: .04em; }
